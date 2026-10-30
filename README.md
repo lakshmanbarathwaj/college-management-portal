@@ -79,6 +79,12 @@ The first superuser email address is used as the administrator recipient; `COLLE
 
 Set `DJANGO_SECRET_KEY` to a new secret value, set `DJANGO_DEBUG=false`, and configure `DJANGO_ALLOWED_HOSTS` with the actual host names. Do not deploy the development secret or demo accounts.
 
+## Deploy the standalone assistant to Vercel
+
+Vercel serves a separate, database-free Flask college assistant from `api/index.py`. It uses the Flask template in `accounts/templates/flask/`, serves assets from `accounts/static/`, and reads its fixed answers and intent aliases from `accounts/data/chat_knowledge.json`. It does not provide the Django application's logins, student records, or database-backed workflows.
+
+Deploy the repository with Vercel using the included `vercel.json`. To test the Flask app locally after installing requirements, run `python -m unittest api.test_index`; the existing Django application can still be run separately using the steps above.
+
 ## Tests
 
 ```powershell

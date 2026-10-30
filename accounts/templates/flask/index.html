@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>College Assistant | Sembon College</title>
+  <script>
+    try {
+      document.documentElement.dataset.theme =
+        localStorage.getItem("sembon.theme") === "dark" ? "dark" : "light";
+    } catch (error) {
+      document.documentElement.dataset.theme = "light";
+    }
+  </script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="{{ url_for('static', filename='accounts/styles.css') }}" rel="stylesheet">
+</head>
+<body>
+  <nav class="navbar navbar-dark app-navbar">
+    <div class="container-xl">
+      <a class="navbar-brand fw-semibold" href="/">
+        <img class="brand-logo" src="{{ url_for('static', filename='accounts/college-logo.svg') }}" alt="">
+        Sembon College
+      </a>
+      <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false">
+        <span class="theme-toggle-icon" aria-hidden="true">◐</span>
+        <span class="theme-toggle-label">Dark mode</span>
+      </button>
+    </div>
+  </nav>
+  <main class="container-xl app-main py-4 py-lg-4">
+    <section class="card border-0 shadow-sm mx-auto" style="max-width: 760px;">
+      <div class="card-body p-4 p-md-5">
+        <div class="eyebrow">SEMBON COLLEGE · B.SC. COMPUTER SCIENCE</div>
+        <h1 class="h2 fw-bold mt-2">College Assistant</h1>
+        <p class="text-secondary">Ask about courses, fees, attendance, or schedules.</p>
+        <div class="chat-transcript mb-3" data-answer role="log" aria-live="polite">
+          <p class="text-secondary mb-0">Your answer will appear here.</p>
+        </div>
+        <form data-question-form>
+          <label class="form-label fw-medium" for="question">Your question</label>
+          <textarea class="form-control mb-2" id="question" name="question" rows="2" maxlength="500" required></textarea>
+          <button class="btn btn-primary" type="submit" data-submit>Ask</button>
+        </form>
+        <div class="d-flex flex-wrap gap-2 mt-3" aria-label="Suggested questions">
+          <button class="btn btn-outline-secondary btn-sm" type="button" data-suggestion="What is the fee structure?">Fees</button>
+          <button class="btn btn-outline-secondary btn-sm" type="button" data-suggestion="What courses are offered?">Courses</button>
+          <button class="btn btn-outline-secondary btn-sm" type="button" data-suggestion="When are classes scheduled?">Schedule</button>
+        </div>
+      </div>
+    </section>
+  </main>
+  <footer class="app-footer">
+    <div class="container-xl">
+      <strong>Sembon College</strong> · B.Sc. Computer Science
+    </div>
+  </footer>
+  <script src="{{ url_for('static', filename='accounts/theme.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='accounts/flask_chat.js') }}" defer></script>
+</body>
+</html>

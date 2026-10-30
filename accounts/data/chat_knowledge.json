@@ -167,5 +167,15 @@
     "attendance": "Attendance is calculated from the attendance records saved for you. The system records attendance once per student per date.",
     "mentor": "Your assigned mentor is shown in your student portal. Use Contact Mentor to forward this chat and continue the conversation here."
   },
-  "unknown_answer": "I don't have reliable information about that. Would you like to chat with a mentor?"
+  "answers": {
+    "fees": "The listed fees are: Term fee - 10000, Exam fee - 5000, Maintenance fee - 5000, and Transport fee - 15000.",
+    "courses": "The listed course is B.Sc. Computer Science.",
+    "assignments": "Assignment records are not available in this standalone, database-free assistant.",
+    "student_results": "Student marks are not available in this standalone, database-free assistant.",
+    "class_results": "Class results are not available in this standalone, database-free assistant.",
+    "attendance": "Attendance records are not available in this standalone, database-free assistant.",
+    "mentor": "Mentor contact records are not available in this standalone, database-free assistant.",
+    "schedule": "No class schedules have been published yet."
+  },
+  "unknown_answer": "I don't have reliable information about that. Try asking about courses, fees, or schedules."
 }
