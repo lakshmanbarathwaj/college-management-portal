@@ -1,0 +1,103 @@
+{% extends "accounts/base.html" %}
+{% block title %}Publish Student Marks{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+  <div>
+    <div class="eyebrow">Sembon College · Staff</div>
+    <h1 class="h2 fw-bold mt-2 mb-1">Student marks &amp; results</h1>
+    <p class="text-secondary mb-0">Publish a subject mark for a student. Students see their own scores, three at a time.</p>
+  </div>
+  <a class="btn btn-outline-primary" href="{% url 'staff_dashboard' %}">← Staff dashboard</a>
+</div>
+<div class="row g-4 mb-4">
+  <div class="col-lg-5">
+    <section class="card border-0 shadow-sm h-100">
+      <div class="card-body p-4">
+        <h2 class="h5 fw-bold mb-3">Publish a student mark</h2>
+        <form method="post">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label fw-medium" for="result-student">Student</label>
+            <select class="form-select" id="result-student" name="student_id" required>
+              <option value="">Choose a student</option>
+              {% for student in students %}
+                <option value="{{ student.pk }}">{{ student.user.get_full_name|default:student.user.email }} · {{ student.user.email }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-medium" for="result-subject">Subject</label>
+            <input class="form-control" id="result-subject" name="subject" maxlength="120" placeholder="e.g. Mathematics" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-medium" for="result-mark">Student mark</label>
+            <div class="input-group">
+              <input class="form-control" id="result-mark" name="mark" type="number" min="0" max="100" step="0.01" placeholder="90" required>
+              <span class="input-group-text">/ 100</span>
+            </div>
+          </div>
+          <button class="btn btn-primary" type="submit">Publish mark</button>
+        </form>
+      </div>
+    </section>
+  </div>
+  <div class="col-lg-7">
+    <section class="card border-0 shadow-sm h-100">
+      <div class="card-body p-4">
+        <h2 class="h5 fw-bold mb-3">Published student marks</h2>
+        <div class="table-responsive">
+          <table class="table align-middle mb-0">
+            <thead><tr><th>Student</th><th>Subject</th><th>Mark</th></tr></thead>
+            <tbody>
+              {% for result in marks %}
+                <tr>
+                  <td>{{ result.student.user.get_full_name|default:result.student.user.email }}</td>
+                  <td>{{ result.subject }}</td>
+                  <td><span class="role-badge">{{ result.mark|floatformat:-2 }} / 100</span></td>
+                </tr>
+              {% empty %}
+                <tr><td class="text-secondary" colspan="3">No individual student marks have been published yet.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<section class="card border-0 shadow-sm">
+  <div class="card-body p-4">
+    <h2 class="h5 fw-bold">Class pass rates</h2>
+    <p class="small text-secondary">Optional course-wide percentages shown separately from individual student marks.</p>
+    <form method="post" class="row g-3 align-items-end">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="publish_rate">
+      <div class="col-md-5">
+        <label class="form-label fw-medium" for="rate-subject">Subject</label>
+        <input class="form-control" id="rate-subject" name="rate_subject" maxlength="120" required>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label fw-medium" for="result-percentage">Pass percentage</label>
+        <div class="input-group">
+          <input class="form-control" id="result-percentage" name="pass_percentage" type="number" min="0" max="100" step="0.01" required>
+          <span class="input-group-text">%</span>
+        </div>
+      </div>
+      <div class="col-md-3"><button class="btn btn-outline-primary" type="submit">Publish pass rate</button></div>
+    </form>
+    {% if results %}
+      <div class="row g-3 mt-2">
+        {% for result in results %}
+          <div class="col-sm-6 col-lg-4">
+            <div class="result-tile">
+              <span class="text-secondary small">{{ result.subject }}</span>
+              <strong>{{ result.pass_percentage|floatformat:-2 }}% <span class="small fw-normal">pass</span></strong>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

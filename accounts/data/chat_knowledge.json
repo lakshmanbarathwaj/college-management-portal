@@ -1,0 +1,171 @@
+{
+  "courses": [
+    "B.Sc. Computer Science"
+  ],
+  "fees": {
+    "items": [
+      {
+        "name": "Term fee",
+        "amount": 10000
+      },
+      {
+        "name": "Exam fee",
+        "amount": 5000
+      },
+      {
+        "name": "Maintenance fee",
+        "amount": 5000
+      },
+      {
+        "name": "Transport fee",
+        "amount": 15000
+      }
+    ]
+  },
+  "schedules": [],
+  "intents": [
+    {
+      "id": "fees",
+      "aliases": [
+        "fee",
+        "fees",
+        "tuition",
+        "cost",
+        "costs",
+        "price",
+        "prices",
+        "payment",
+        "payments",
+        "charges",
+        "how much"
+      ],
+      "suggestions": [
+        "What courses are offered?",
+        "How is attendance calculated?",
+        "When are classes scheduled?"
+      ]
+    },
+    {
+      "id": "courses",
+      "aliases": [
+        "course",
+        "courses",
+        "program",
+        "programme",
+        "degree",
+        "department",
+        "major"
+      ],
+      "suggestions": [
+        "What is the fee structure?",
+        "How is attendance calculated?",
+        "When are classes scheduled?"
+      ]
+    },
+    {
+      "id": "assignments",
+      "aliases": [
+        "assignment",
+        "assignments",
+        "homework",
+        "coursework",
+        "due date",
+        "deadlines"
+      ],
+      "suggestions": [
+        "Show my marks",
+        "What courses are offered?",
+        "How is attendance calculated?"
+      ]
+    },
+    {
+      "id": "student_results",
+      "aliases": [
+        "my mark",
+        "my marks",
+        "my grade",
+        "my grades",
+        "my result",
+        "my results",
+        "published result",
+        "published results",
+        "published marks",
+        "published grades",
+        "score",
+        "scores"
+      ],
+      "suggestions": [
+        "What assignments are pending?",
+        "What are the class pass rates?",
+        "What courses are offered?"
+      ]
+    },
+    {
+      "id": "class_results",
+      "aliases": [
+        "pass rate",
+        "pass rates",
+        "class result",
+        "class results",
+        "course result",
+        "course results"
+      ],
+      "suggestions": [
+        "Show my marks",
+        "What courses are offered?",
+        "What assignments are pending?"
+      ]
+    },
+    {
+      "id": "attendance",
+      "aliases": [
+        "attendance",
+        "absent",
+        "absence",
+        "present",
+        "attendance percentage"
+      ],
+      "suggestions": [
+        "What assignments are pending?",
+        "Show my marks",
+        "What is the fee structure?"
+      ]
+    },
+    {
+      "id": "mentor",
+      "aliases": [
+        "mentor",
+        "advisor",
+        "adviser",
+        "contact my mentor"
+      ],
+      "suggestions": [
+        "What courses are offered?",
+        "What assignments are pending?",
+        "What is the fee structure?"
+      ]
+    },
+    {
+      "id": "schedule",
+      "aliases": [
+        "schedule",
+        "schedules",
+        "timetable",
+        "class time",
+        "class times",
+        "when do classes",
+        "class hours"
+      ],
+      "suggestions": [
+        "What courses are offered?",
+        "How is attendance calculated?",
+        "What assignments are pending?"
+      ]
+    }
+  ],
+  "faqs": {
+    "attendance": "Attendance is calculated from the attendance records saved for you. The system records attendance once per student per date.",
+    "mentor": "Your assigned mentor is shown in your student portal. Use Contact Mentor to forward this chat and continue the conversation here."
+  },
+  "unknown_answer": "I don't have reliable information about that. Would you like to chat with a mentor?"
+}

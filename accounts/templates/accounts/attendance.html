@@ -1,0 +1,53 @@
+{% extends "accounts/base.html" %}
+{% block title %}Attendance{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+  <div>
+    <div class="eyebrow">Sembon College · Staff</div>
+    <h1 class="h2 fw-bold mt-2 mb-1">Student attendance</h1>
+    <p class="text-secondary mb-0">Record daily attendance for B.Sc. Computer Science students.</p>
+  </div>
+</div>
+<section class="card border-0 shadow-sm">
+  <div class="card-body p-4">
+    <form method="get" class="row g-3 align-items-end mb-4">
+      <div class="col-sm-6 col-md-4">
+        <label class="form-label fw-medium" for="attendance-date">Date</label>
+        <input class="form-control" id="attendance-date" type="date" name="date" value="{{ selected_date|date:'Y-m-d' }}" required>
+      </div>
+      <div class="col-auto"><button class="btn btn-outline-primary" type="submit">Show date</button></div>
+    </form>
+    <form method="post">
+      {% csrf_token %}
+      <input type="hidden" name="date" value="{{ selected_date|date:'Y-m-d' }}">
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+        <h2 class="h5 fw-bold mb-0">{{ selected_date|date:"d M Y" }} · Students ({{ students|length }})</h2>
+        <span class="small text-secondary">Selected students will be marked present.</span>
+      </div>
+      {% if students %}
+      <div class="table-responsive">
+        <table class="table align-middle mb-4">
+          <thead><tr><th class="ps-3">Student</th><th>Email</th><th class="text-center">Present</th></tr></thead>
+          <tbody>
+            {% for student in students %}
+            <tr>
+              <td class="ps-3 fw-medium">{{ student.user.get_full_name|default:"Name not provided" }}</td>
+              <td class="text-secondary">{{ student.user.email }}</td>
+              <td class="text-center">
+                <input class="form-check-input attendance-checkbox" type="checkbox" name="present_students" value="{{ student.pk }}" aria-label="{{ student.user.get_full_name }} present"
+                  {% if student.is_present_for_date %}checked{% endif %}>
+                {% if student.has_attendance_for_date %}<span class="small text-secondary ms-1">Saved</span>{% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <button class="btn btn-primary" type="submit">Save attendance</button>
+      {% else %}
+      <p class="text-secondary mb-0">No student records found.</p>
+      {% endif %}
+    </form>
+  </div>
+</section>
+{% endblock %}

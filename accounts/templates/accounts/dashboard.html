@@ -1,0 +1,85 @@
+{% extends "accounts/base.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+  <div>
+    <div class="eyebrow">Sembon College · Administration</div>
+    <h1 class="h2 fw-bold mt-2 mb-1">Admin dashboard</h1>
+    <p class="text-secondary mb-0">Welcome, {{ user.first_name|default:user.email }}. Your college overview is ready.</p>
+  </div>
+  <span class="status-pill"><span></span>Administrator</span>
+</div>
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <div class="card stat-card h-100">
+      <div class="card-body d-flex justify-content-between align-items-center p-4">
+        <div><p class="text-secondary mb-2">Staff</p><div class="stat-number">{{ staff_count }}</div><a class="stretched-link text-decoration-none small" href="{% url 'staff_directory' %}">Staff directory <span aria-hidden="true">→</span></a></div>
+        <div class="stat-icon staff-icon">STA</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card stat-card h-100">
+      <div class="card-body d-flex justify-content-between align-items-center p-4">
+        <div><p class="text-secondary mb-2">Students</p><div class="stat-number">{{ student_count }}</div><a class="stretched-link text-decoration-none small" href="{% url 'student_directory' %}">Student directory <span aria-hidden="true">→</span></a></div>
+        <div class="stat-icon student-icon">STU</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card stat-card h-100">
+      <div class="card-body d-flex justify-content-between align-items-center p-4">
+        <div><p class="text-secondary mb-2">Attendance records</p><div class="stat-number">{{ attendance_count }}</div><span class="small text-secondary">Daily records saved</span></div>
+        <div class="stat-icon student-icon">ATT</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row g-3 mb-4">
+  <div class="col-md-6">
+    <a class="dashboard-action-card" href="{% url 'message_center' %}">
+      <span class="dashboard-action-icon">MSG</span>
+      <span><strong>Student conversations</strong><small>{{ chat_count }} conversation{{ chat_count|pluralize }} waiting for staff follow-up</small></span>
+      <span class="dashboard-action-arrow" aria-hidden="true">→</span>
+    </a>
+  </div>
+  <div class="col-md-6">
+    <a class="dashboard-action-card" href="{% url 'admin_inbox' %}">
+      <span class="dashboard-action-icon">IN</span>
+      <span><strong>Administration inbox</strong><small>{{ unread_message_count }} messages or membership requests need review</small></span>
+      <span class="dashboard-action-arrow" aria-hidden="true">→</span>
+    </a>
+  </div>
+</div>
+<section class="card border-0 shadow-sm">
+  <div class="card-body p-0">
+    <div class="d-flex justify-content-between align-items-center p-4 border-bottom">
+      <div><h2 class="h5 fw-bold mb-1">Recently joined</h2><p class="small text-secondary mb-0">Total attendance records: {{ attendance_count }}</p></div>
+      <div class="d-flex gap-3">
+        <a class="small text-decoration-none" href="{% url 'student_directory' %}">Student details</a>
+        <a class="small text-decoration-none" href="{% url 'admin_inbox' %}">Admin inbox ({{ unread_message_count }} pending/unread)</a>
+        <a class="small text-decoration-none" href="{% url 'message_center' %}">Student chats</a>
+      </div>
+    </div>
+    {% if recent_users %}
+    <div class="table-responsive">
+      <table class="table align-middle mb-0">
+        <thead><tr><th class="ps-4">Name</th><th>Email</th><th>Role</th><th class="pe-4">Department</th></tr></thead>
+        <tbody>
+          {% for person in recent_users %}
+          <tr>
+            <td class="ps-4 fw-medium">{{ person.get_full_name|default:"Name not provided" }}</td>
+            <td class="text-secondary">{{ person.email }}</td>
+            <td><span class="role-badge">{{ person.profile.get_role_display }}</span></td>
+            <td class="pe-4 text-secondary">{{ person.profile.get_department_display }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+      <div class="p-4 text-secondary">No staff or student records found.</div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

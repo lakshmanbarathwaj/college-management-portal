@@ -1,0 +1,66 @@
+{% extends "accounts/base.html" %}
+{% block title %}Track Assignment{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+  <div>
+    <div class="eyebrow">Sembon College · Staff</div>
+    <h1 class="h2 fw-bold mt-2 mb-1">{{ assignment.title }}</h1>
+    <p class="text-secondary mb-1">{{ assignment.description|linebreaksbr }}</p>
+    <p class="small text-secondary mb-0">Due {{ assignment.due_date|date:"d M Y" }}</p>
+  </div>
+  <a class="btn btn-outline-primary" href="{% url 'staff_assignments' %}">← Assignments</a>
+</div>
+<section class="card border-0 shadow-sm mb-4">
+  <div class="card-body p-4">
+    <h2 class="h5 fw-bold mb-3">Edit assignment</h2>
+    <form method="post">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="edit_assignment">
+      <div class="mb-3">
+        <label class="form-label fw-medium" for="assignment-title">Title</label>
+        <input class="form-control" id="assignment-title" name="title" maxlength="200" value="{{ assignment.title }}" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label fw-medium" for="assignment-description">Description</label>
+        <textarea class="form-control" id="assignment-description" name="description" rows="4" required>{{ assignment.description }}</textarea>
+      </div>
+      <div class="mb-3">
+        <label class="form-label fw-medium" for="assignment-due-date">Due date</label>
+        <input class="form-control" id="assignment-due-date" name="due_date" type="date" value="{{ assignment.due_date|date:'Y-m-d' }}" required>
+      </div>
+      <button class="btn btn-primary" type="submit">Save assignment</button>
+    </form>
+  </div>
+</section>
+<section class="card border-0 shadow-sm">
+  <div class="card-body p-4">
+    <h2 class="h5 fw-bold mb-3">Student completion</h2>
+    <form method="post">
+      {% csrf_token %}
+      {% if students %}
+        <div class="table-responsive">
+          <table class="table align-middle">
+            <thead><tr><th>Student</th><th>Email</th><th class="text-center">Completed</th></tr></thead>
+            <tbody>
+              {% for student in students %}
+                <tr>
+                  <td>{{ student.user.get_full_name|default:"Name not provided" }}</td>
+                  <td>{{ student.user.email }}</td>
+                  <td class="text-center"><input class="form-check-input" type="checkbox" name="completed_students" value="{{ student.pk }}" aria-label="{{ student.user.get_full_name }} completed" {% if student.is_completed %}checked{% endif %}></td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <button class="btn btn-primary" type="submit" name="action" value="save">Save completion status</button>
+      {% else %}
+        <p class="text-secondary mb-0">No student records found.</p>
+      {% endif %}
+    </form>
+    <form method="post" class="mt-4" onsubmit="return confirm('Delete this assignment? This also deletes its completion records.');">
+      {% csrf_token %}
+      <button class="btn btn-outline-danger" type="submit" name="action" value="delete">Delete assignment</button>
+    </form>
+  </div>
+</section>
+{% endblock %}

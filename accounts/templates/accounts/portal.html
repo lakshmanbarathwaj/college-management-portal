@@ -1,0 +1,280 @@
+{% extends "accounts/base.html" %}
+{% load static %}
+{% block title %}Student Dashboard{% endblock %}
+{% block body_class %}student-portal{% endblock %}
+{% block content %}
+<section class="dashboard-welcome mb-4">
+  <div>
+    <div class="eyebrow">Sembon College · Student portal</div>
+    <h1 class="h2 fw-bold mt-2 mb-1">Good to see you, {{ user.first_name|default:user.email }}</h1>
+    <p class="text-secondary mb-0">{{ profile.get_department_display }} · Your learning at a glance.</p>
+  </div>
+  <span class="status-pill"><span></span>Student</span>
+</section>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <section class="card student-summary-card h-100">
+      <div class="card-body p-4">
+        <div class="detail-label">Attendance</div>
+        <div class="student-summary-value {% if attendance_total and attendance_percentage < 70 %}attendance-low{% endif %}">{{ attendance_percentage|floatformat:1 }}%</div>
+        <div class="small text-secondary">{{ attendance_present }} of {{ attendance_total }} recorded days present</div>
+        {% if attendance_total and attendance_percentage < 70 %}
+          <div class="small text-danger mt-2">Below 70% — contact your mentor for support.</div>
+        {% endif %}
+      </div>
+    </section>
+  </div>
+  <div class="col-md-4">
+    <section class="card student-summary-card h-100">
+      <div class="card-body p-4">
+        <div class="detail-label">Assignments</div>
+        <div class="student-summary-value">{{ assignments|length }}</div>
+        <div class="small text-secondary">Coursework assigned to you</div>
+        <a class="small d-inline-block mt-2" href="#coursework">View assignments ↓</a>
+      </div>
+    </section>
+  </div>
+  <div class="col-md-4">
+    <section class="card student-summary-card h-100">
+      <div class="card-body p-4">
+        <div class="detail-label">Your mentor</div>
+        {% if profile.mentor %}
+          <div class="fw-semibold mt-2">{{ profile.mentor.user.get_full_name|default:"Assigned mentor" }}</div>
+          <details class="mt-1">
+            <summary class="btn btn-link btn-sm p-0">Contact your mentor</summary>
+            <div class="small mt-2">
+              <div><strong>Name:</strong> {{ profile.mentor.user.get_full_name|default:"Assigned mentor" }}</div>
+              <div>
+                <strong>Email:</strong>
+                {% if profile.mentor.user.email %}
+                  <a href="mailto:{{ profile.mentor.user.email }}">{{ profile.mentor.user.email }}</a>
+                {% else %}
+                  Not provided
+                {% endif %}
+              </div>
+              {% if profile.mentor.phone %}<div><strong>Phone:</strong> {{ profile.mentor.phone }}</div>{% endif %}
+              {% if profile.mentor.expertise %}<div><strong>Expertise:</strong> {{ profile.mentor.expertise }}</div>{% endif %}
+            </div>
+          </details>
+        {% else %}
+          <div class="fw-semibold mt-2">Not assigned yet</div>
+          <button class="btn btn-link btn-sm p-0" type="button" data-open-mentor-picker>Browse mentors</button>
+        {% endif %}
+      </div>
+    </section>
+  </div>
+</div>
+
+<section class="card border-0 shadow-sm mb-4" id="coursework">
+  <div class="card-body p-4 p-md-5">
+    <div class="eyebrow">Coursework</div>
+    <h2 class="h4 fw-bold mt-2">Assignments</h2>
+    {% if assignments %}
+      <div class="table-responsive mt-3">
+        <table class="table align-middle">
+          <thead><tr><th>Assignment</th><th>Due date</th><th>Status</th></tr></thead>
+          <tbody>
+            {% for assignment, completion in assignments %}
+              <tr>
+                <td><div class="fw-medium">{{ assignment.title }}</div><div class="small text-secondary">{{ assignment.description|linebreaksbr }}</div></td>
+                <td>{{ assignment.due_date|date:"d M Y" }}</td>
+                <td>{% if completion and completion.is_completed %}<span class="badge text-bg-success">Completed</span>{% else %}<span class="badge text-bg-warning">Pending</span>{% endif %}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="text-secondary mb-0 mt-3">There are no assignments yet. New coursework will appear here.</p>
+    {% endif %}
+  </div>
+</section>
+
+<section class="card border-0 shadow-sm mb-4" id="student-marks">
+  <div class="card-body p-4 p-md-5">
+    <div class="d-flex flex-wrap justify-content-between align-items-start gap-2">
+      <div>
+        <div class="eyebrow">Your academic record</div>
+        <h2 class="h4 fw-bold mt-2">Your marks</h2>
+        <p class="small text-secondary mb-0">Scores are out of 100. Only your marks are shown here.</p>
+      </div>
+      {% if student_marks.paginator.count %}
+        <span class="role-badge">{{ student_marks.paginator.count }} subject{{ student_marks.paginator.count|pluralize }}</span>
+      {% endif %}
+    </div>
+    {% if student_marks %}
+      <div class="row g-3 mt-1">
+        {% for result in student_marks %}
+          <div class="col-sm-6 col-lg-4">
+            <div class="result-tile">
+              <span class="text-secondary small">{{ result.subject }}</span>
+              <strong>{{ result.mark|floatformat:-2 }}<span class="small fw-normal"> / 100</span></strong>
+              <span class="small text-secondary">Published {{ result.updated_at|date:"d M Y" }}</span>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+      {% if student_marks.has_other_pages %}
+        <nav class="mt-4 d-flex justify-content-between align-items-center" aria-label="Student marks pages">
+          {% if student_marks.has_previous %}
+            <a class="btn btn-sm btn-outline-primary" href="?marks_page={{ student_marks.previous_page_number }}#student-marks">← Previous 3</a>
+          {% else %}
+            <span></span>
+          {% endif %}
+          <span class="small text-secondary">Page {{ student_marks.number }} of {{ student_marks.paginator.num_pages }}</span>
+          {% if student_marks.has_next %}
+            <a class="btn btn-sm btn-outline-primary" href="?marks_page={{ student_marks.next_page_number }}#student-marks">Next 3 →</a>
+          {% else %}
+            <span></span>
+          {% endif %}
+        </nav>
+      {% endif %}
+    {% else %}
+      <p class="text-secondary mb-0 mt-2">Your marks will appear here when staff publish them.</p>
+    {% endif %}
+  </div>
+</section>
+
+<section class="card border-0 shadow-sm mb-4">
+  <div class="card-body p-4 p-md-5">
+    <div class="d-flex flex-wrap justify-content-between align-items-start gap-2">
+      <div><div class="eyebrow">Academic updates</div><h2 class="h4 fw-bold mt-2">Class pass rates</h2></div>
+      <span class="role-badge">{{ published_results|length }} subjects</span>
+    </div>
+    {% if published_results %}
+      <div class="row g-3 mt-1">
+        {% for result in published_results %}
+          <div class="col-sm-6 col-lg-4">
+            <div class="result-tile">
+              <span class="text-secondary small">{{ result.subject }}</span>
+              <strong>{{ result.pass_percentage|floatformat:-2 }}% <span class="small fw-normal">pass</span></strong>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="text-secondary mb-0 mt-2">Results will appear here when staff publish them.</p>
+    {% endif %}
+  </div>
+</section>
+
+<section class="chat-card" id="student-chat" data-user-key="{{ user.pk }}"
+  data-conversation-id="{{ conversation.pk|default:'' }}"
+  data-chat-status="{% if conversation.forwarded_to_id %}{{ conversation.status }}{% endif %}"
+  data-mentors-url="{% url 'student_chat_mentors' %}"
+  data-forward-url="{% url 'student_chat_forward' %}"
+  data-updates-url-template="{% url 'student_chat_updates' 0 %}">
+  <header class="chat-heading">
+    <div class="chat-title">
+      <span class="chat-heading-icon" aria-hidden="true">✦</span>
+      <div>
+        <div class="eyebrow">Student help desk</div>
+        <h2 class="h4 fw-bold mt-1 mb-1">Campus assistant</h2>
+        <p class="small text-secondary mb-0">Ask about coursework, fees, or published results. Other questions reach your mentor and the college team.</p>
+      </div>
+    </div>
+    <div class="chat-heading-actions">
+      <span class="chat-online"><span></span>Ready to help</span>
+      <span class="chat-status-badge" data-chat-status-label {% if not conversation.forwarded_to_id %}hidden{% endif %}>{% if conversation.forwarded_to_id %}{{ conversation.get_status_display }}{% endif %}</span>
+      <button class="chat-action" type="button" data-new-chat>New Chat</button>
+      <button class="chat-action chat-action-muted" type="button" data-clear-chat>Clear</button>
+    </div>
+  </header>
+  <div class="chat-layout">
+    <aside class="chat-history" aria-label="Saved chat history">
+      <div class="chat-history-heading">
+        <h3>History</h3>
+        <button class="chat-history-clear" type="button" data-clear-history>Clear history</button>
+      </div>
+      <div class="chat-history-list" data-history-list></div>
+      <p class="chat-history-empty" data-history-empty>No saved questions yet.</p>
+    </aside>
+    <div class="chat-main">
+      <div class="chat-transcript" id="chat-transcript" role="log" aria-live="polite" aria-relevant="additions text">
+        {% if chat_messages %}
+          {% for chat_message in chat_messages %}
+            <div class="chat-message-row {% if chat_message.sender == user %}chat-message-own{% elif chat_message.sender %}chat-message-staff{% else %}chat-message-bot{% endif %}" data-chat-role="{% if chat_message.sender == user %}user{% elif chat_message.sender %}mentor{% else %}assistant{% endif %}" data-message-id="{{ chat_message.pk }}">
+              <span class="chat-avatar" aria-hidden="true">{% if chat_message.sender == user %}{{ user.first_name|default:"Y"|slice:":1"|upper }}{% elif chat_message.sender %}{{ chat_message.sender.get_full_name|default:chat_message.sender.email|slice:":1"|upper }}{% else %}AI{% endif %}</span>
+              <div class="chat-message-bubble">
+                <div class="chat-message-meta">
+                  <span class="chat-message-author">{% if chat_message.sender == user %}You{% elif chat_message.sender %}{{ chat_message.sender.get_full_name|default:"Mentor" }}{% else %}Campus assistant{% endif %}</span>
+                  {% if chat_message.sender != user %}<button class="chat-copy" type="button" data-copy-answer aria-label="Copy answer">Copy</button>{% endif %}
+                </div>
+                <div class="chat-message-text">{{ chat_message.body }}</div>
+                {% if not chat_message.sender and forloop.last %}
+                  <div class="chat-message-actions">
+                    {% for suggestion in chat_suggestions %}
+                      <button class="chat-followup" type="button" data-chat-question="{{ suggestion }}">{{ suggestion }}</button>
+                    {% endfor %}
+                    {% if chat_needs_mentor %}
+                      <button class="chat-followup chat-followup-contact" type="button" data-open-mentor-picker data-chat-topic="{{ chat_messages.0.body }}">Contact Mentor</button>
+                    {% endif %}
+                  </div>
+                {% endif %}
+                <time class="chat-message-time" datetime="{{ chat_message.sent_at|date:'c' }}">{{ chat_message.sent_at|date:"d M, H:i" }}</time>
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="chat-empty-state">
+            <span class="chat-empty-icon" aria-hidden="true">✦</span>
+            <h3>Hi {{ user.first_name|default:"there" }}! What can I help with?</h3>
+            <p>I can check your pending assignments, explain the fee structure, or show published results.</p>
+            <div class="chat-suggestions" aria-label="Example questions">
+              <button class="chat-suggestion" type="button" data-chat-question="What assignments are pending?">What assignments are pending?</button>
+              <button class="chat-suggestion" type="button" data-chat-question="What is the fee structure?">What is the fee structure?</button>
+              <button class="chat-suggestion" type="button" data-chat-question="Show my results">Show my results</button>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+      <div class="chat-feedback" data-chat-feedback role="status" aria-live="polite"></div>
+      <div class="mentor-picker" data-mentor-picker hidden>
+        <div class="mentor-picker-heading">
+          <div>
+            <h3>Contact a mentor</h3>
+            <p>Select a mentor to forward this conversation in the college portal.</p>
+          </div>
+          <button class="chat-history-clear" type="button" data-close-mentor-picker>Cancel</button>
+        </div>
+        <form method="post" action="{% url 'student_chat_forward' %}" data-mentor-form>
+          {% csrf_token %}
+          <input type="hidden" name="conversation_id" value="{{ conversation.pk|default:'' }}" data-forward-conversation>
+          <label class="visually-hidden" for="chat-mentor-select">Choose a mentor</label>
+          <select class="form-select" id="chat-mentor-select" name="mentor_id" required></select>
+          <div class="mentor-preview" data-mentor-preview></div>
+          <button class="btn btn-primary btn-sm mt-2" type="submit" data-forward-chat>Forward this chat</button>
+        </form>
+      </div>
+      <form class="chat-compose" method="post" action="{% url 'student_chat_message' %}" data-chat-form>
+        {% csrf_token %}
+        <input type="hidden" name="conversation_id" value="{{ conversation.pk|default:'' }}" data-chat-conversation>
+        <label class="visually-hidden" for="chat-question">Your message</label>
+        <textarea class="form-control" id="chat-question" name="question" rows="1" maxlength="2000" placeholder="Write your question..." required aria-describedby="chat-input-hint"></textarea>
+        <div class="chat-compose-footer">
+          <span class="chat-input-hint" id="chat-input-hint">Enter to send · Shift + Enter for a new line</span>
+          <button class="btn btn-primary chat-send" type="submit" data-chat-send disabled>
+            <span>Send</span><span aria-hidden="true">↑</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <template data-chat-empty-state>
+    <div class="chat-empty-state">
+      <span class="chat-empty-icon" aria-hidden="true">✦</span>
+      <h3>Start a new conversation</h3>
+      <p>Choose an example or type a question. Your saved chats stay in History.</p>
+      <div class="chat-suggestions" aria-label="Example questions">
+        <button class="chat-suggestion" type="button" data-chat-question="What assignments are pending?">What assignments are pending?</button>
+        <button class="chat-suggestion" type="button" data-chat-question="What is the fee structure?">What is the fee structure?</button>
+        <button class="chat-suggestion" type="button" data-chat-question="Show my results">Show my results</button>
+      </div>
+    </div>
+  </template>
+</section>
+{% endblock %}
+{% block extra_scripts %}
+  <script src="{% static 'accounts/chat.js' %}" defer></script>
+{% endblock %}

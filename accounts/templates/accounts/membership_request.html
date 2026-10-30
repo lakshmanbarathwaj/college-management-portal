@@ -1,0 +1,54 @@
+{% extends "accounts/base.html" %}
+{% block title %}Request an Account{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="mb-4">
+      <div class="eyebrow">Sembon College</div>
+      <h1 class="h2 fw-bold mt-2 mb-1">Request a staff or student account</h1>
+      <p class="text-secondary mb-0">An administrator will review your request. If approved, the administrator will create your account and provide an initial password.</p>
+    </div>
+    <section class="card border-0 shadow-sm">
+      <div class="card-body p-4 p-md-5">
+        <form method="post">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label fw-medium" for="full-name">Full name</label>
+            <input class="form-control" id="full-name" name="full_name" maxlength="150" value="{{ request.POST.full_name|default:'' }}" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-medium" for="email">Email address</label>
+            <input class="form-control" id="email" name="email" type="email" maxlength="254" value="{{ request.POST.email|default:'' }}" required>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-medium" for="role">Applying as</label>
+              <select class="form-select" id="role" name="role" required>
+                <option value="">Choose a role</option>
+                <option value="student" {% if request.POST.role == "student" %}selected{% endif %}>Student</option>
+                <option value="staff" {% if request.POST.role == "staff" %}selected{% endif %}>Staff</option>
+              </select>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-medium" for="department">Department</label>
+              <select class="form-select" id="department" name="department" required>
+                <option value="B.Sc. Computer Science" {% if request.POST.department == "B.Sc. Computer Science" %}selected{% endif %}>B.Sc. Computer Science</option>
+              </select>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-medium" for="phone">Phone number <span class="text-secondary">(optional)</span></label>
+            <input class="form-control" id="phone" name="phone" maxlength="30" value="{{ request.POST.phone|default:'' }}">
+          </div>
+          <div class="mb-4">
+            <label class="form-label fw-medium" for="message">Short application message <span class="text-secondary">(optional)</span></label>
+            <textarea class="form-control" id="message" name="message" rows="4">{{ request.POST.message|default:'' }}</textarea>
+          </div>
+          <button class="btn btn-primary" type="submit">Submit request</button>
+          <a class="btn btn-link" href="{% url 'index' %}">Back to sign in</a>
+        </form>
+      </div>
+    </section>
+  </div>
+</div>
+{% endblock %}

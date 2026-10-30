@@ -1,0 +1,64 @@
+{% extends "accounts/base.html" %}
+{% block title %}Student Message Center{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+  <div>
+    <div class="eyebrow">Sembon College · {% if user.is_superuser %}Administration{% else %}Staff{% endif %}</div>
+    <h1 class="h2 fw-bold mt-2 mb-1">Student message center</h1>
+    <p class="text-secondary mb-0">Conversations needing a personal response from the mentor or college team.</p>
+  </div>
+  {% if user.is_superuser %}
+    <a class="btn btn-outline-primary" href="{% url 'home' %}">← Admin dashboard</a>
+  {% else %}
+    <a class="btn btn-outline-primary" href="{% url 'staff_dashboard' %}">← Staff dashboard</a>
+  {% endif %}
+</div>
+{% for conversation in conversations %}
+  <section class="card border-0 shadow-sm mb-3">
+    <div class="card-body p-4">
+      <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 border-bottom pb-3 mb-3">
+        <div>
+          <h2 class="h5 fw-bold mb-1">{{ conversation.student.user.get_full_name|default:"Student" }}</h2>
+          <div class="small text-secondary mt-1">
+            {% if conversation.student.mentor %}
+              Mentor: {{ conversation.student.mentor.user.get_full_name|default:conversation.student.mentor.user.email }}
+            {% else %}
+              No mentor assigned · visible to the staff team
+            {% endif %}
+          </div>
+        </div>
+        <span class="badge text-bg-warning">Needs a reply</span>
+      </div>
+      <div class="chat-thread">
+        {% for chat_message in conversation.messages.all %}
+          <div class="chat-thread-message {% if chat_message.sender %}chat-thread-human{% else %}chat-thread-bot{% endif %}">
+            <div class="small fw-semibold mb-1">
+              {% if chat_message.sender %}
+                {% if chat_message.sender == conversation.student.user %}Student{% else %}{{ chat_message.sender.get_full_name|default:chat_message.sender.email }}{% endif %}
+              {% else %}
+                Campus assistant
+              {% endif %}
+              <time class="text-secondary fw-normal"> · {{ chat_message.sent_at|date:"d M Y, H:i" }}</time>
+            </div>
+            <div>{{ chat_message.body|linebreaksbr }}</div>
+          </div>
+        {% endfor %}
+      </div>
+      <form class="mt-3" method="post" action="{% url 'staff_reply_to_chat' conversation.pk %}">
+        {% csrf_token %}
+        <label class="form-label fw-medium" for="reply-{{ conversation.pk }}">Reply to student</label>
+        <textarea class="form-control mb-2" id="reply-{{ conversation.pk }}" name="body" rows="2" maxlength="4000" required></textarea>
+        <button class="btn btn-primary btn-sm" type="submit">Send reply</button>
+      </form>
+    </div>
+  </section>
+{% empty %}
+  <section class="card border-0 shadow-sm">
+    <div class="card-body p-5 text-center">
+      <div class="empty-state-icon mb-3" aria-hidden="true">✓</div>
+      <h2 class="h5 fw-bold">You're all caught up</h2>
+      <p class="text-secondary mb-0">No student conversations are waiting for a staff reply.</p>
+    </div>
+  </section>
+{% endfor %}
+{% endblock %}

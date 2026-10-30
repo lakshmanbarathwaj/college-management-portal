@@ -1,0 +1,46 @@
+{% extends "accounts/base.html" %}
+{% block title %}Assignments{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+  <div>
+    <div class="eyebrow">Sembon College · Staff</div>
+    <h1 class="h2 fw-bold mt-2 mb-1">Assignments</h1>
+    <p class="text-secondary mb-0">Create coursework and track completion for each student.</p>
+  </div>
+  <a class="btn btn-outline-primary" href="{% url 'staff_dashboard' %}">← Staff dashboard</a>
+</div>
+<section class="card border-0 shadow-sm mb-4">
+  <div class="card-body p-4">
+    <h2 class="h5 fw-bold mb-3">Create assignment</h2>
+    <form method="post">
+      {% csrf_token %}
+      <div class="mb-3">
+        <label class="form-label fw-medium" for="assignment-title">Title</label>
+        <input class="form-control" id="assignment-title" name="title" maxlength="200" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label fw-medium" for="assignment-description">Description</label>
+        <textarea class="form-control" id="assignment-description" name="description" rows="4" required></textarea>
+      </div>
+      <div class="mb-3">
+        <label class="form-label fw-medium" for="assignment-due-date">Due date</label>
+        <input class="form-control" id="assignment-due-date" name="due_date" type="date" required>
+      </div>
+      <button class="btn btn-primary" type="submit">Create assignment</button>
+    </form>
+  </div>
+</section>
+<section class="card border-0 shadow-sm">
+  <div class="card-body">
+    <h2 class="h5 fw-bold mb-3">Current assignments</h2>
+    {% for assignment in assignments %}
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 border-top py-3">
+        <div><h3 class="h6 fw-semibold mb-1">{{ assignment.title }}</h3><span class="small text-secondary">Due {{ assignment.due_date|date:"d M Y" }}</span></div>
+        <a class="btn btn-sm btn-outline-primary" href="{% url 'staff_assignment_detail' assignment.pk %}">Track completion</a>
+      </div>
+    {% empty %}
+      <p class="text-secondary mb-0">No assignments have been created.</p>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

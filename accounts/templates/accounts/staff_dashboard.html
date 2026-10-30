@@ -1,0 +1,63 @@
+{% extends "accounts/base.html" %}
+{% block title %}Staff Dashboard{% endblock %}
+{% block content %}
+<section class="dashboard-welcome mb-4">
+  <div>
+    <div class="eyebrow">Sembon College · Staff portal</div>
+    <h1 class="h2 fw-bold mt-2 mb-1">Welcome, {{ user.first_name|default:user.email }}</h1>
+    <p class="text-secondary mb-0">Your teaching tools and student support, all in one place.</p>
+  </div>
+  <span class="status-pill"><span></span>Staff</span>
+</section>
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <div class="card stat-card h-100"><div class="card-body p-4">
+      <div class="stat-icon staff-icon mb-3">ATT</div>
+      <p class="text-secondary mb-2">Daily attendance</p>
+      <p class="mb-3">Mark and review daily student attendance.</p>
+      <a class="btn btn-primary" href="{% url 'attendance_mark' %}">Mark attendance</a>
+    </div></div>
+  </div>
+  <div class="col-md-4">
+    <div class="card stat-card h-100"><div class="card-body p-4">
+      <div class="stat-icon student-icon mb-3">STU</div>
+      <p class="text-secondary mb-2">Your students</p>
+      <div class="stat-number">{{ student_count }}</div>
+      <p class="mb-3">Review each student's attendance percentage.</p>
+      <a class="btn btn-outline-primary" href="{% url 'staff_students' %}">View students</a>
+    </div></div>
+  </div>
+  <div class="col-md-4">
+    <div class="card stat-card h-100"><div class="card-body p-4">
+      <div class="stat-icon staff-icon mb-3">ASG</div>
+      <p class="text-secondary mb-2">Coursework</p>
+      <div class="stat-number">{{ assignment_count }}</div>
+      <p class="mb-3">Create assignments and track student completion.</p>
+      <a class="btn btn-outline-primary" href="{% url 'staff_assignments' %}">Manage assignments</a>
+    </div></div>
+  </div>
+</div>
+<div class="row g-3">
+  <div class="col-md-6">
+    <a class="dashboard-action-card" href="{% url 'message_center' %}">
+      <span class="dashboard-action-icon">MSG</span>
+      <span><strong>Student message center</strong><small>{{ message_count }} conversation{{ message_count|pluralize }} waiting for a reply</small></span>
+      <span class="dashboard-action-arrow" aria-hidden="true">→</span>
+    </a>
+  </div>
+  <div class="col-md-6">
+    <a class="dashboard-action-card" href="{% url 'staff_results' %}">
+      <span class="dashboard-action-icon">RES</span>
+      <span><strong>Publish course results</strong><small>{{ result_count }} subject{{ result_count|pluralize }} currently published</small></span>
+      <span class="dashboard-action-arrow" aria-hidden="true">→</span>
+    </a>
+  </div>
+  <div class="col-md-6">
+    <a class="dashboard-action-card" href="{% url 'mentor_dashboard' %}">
+      <span class="dashboard-action-icon">CHAT</span>
+      <span><strong>Mentor dashboard</strong><small>Reply to student chats forwarded to you.</small></span>
+      <span class="dashboard-action-arrow" aria-hidden="true">→</span>
+    </a>
+  </div>
+</div>
+{% endblock %}

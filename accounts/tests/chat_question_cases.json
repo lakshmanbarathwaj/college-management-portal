@@ -1,0 +1,92 @@
+[
+  {
+    "question": "What are the fees?",
+    "expected_intents": ["fees"],
+    "expected_answer_contains": ["Current fee structure:"]
+  },
+  {
+    "question": "How much is tuition?",
+    "expected_intents": ["fees"],
+    "expected_answer_contains": ["Current fee structure:"]
+  },
+  {
+    "question": "What is the price?",
+    "expected_intents": ["fees"],
+    "expected_answer_contains": ["Current fee structure:"]
+  },
+  {
+    "question": "Tell me about tuition costs",
+    "expected_intents": ["fees"],
+    "expected_answer_contains": ["Current fee structure:"]
+  },
+  {
+    "question": "Which degree is offered?",
+    "expected_intents": ["courses"],
+    "expected_answer_contains": ["Courses currently listed:", "B.Sc. Computer Science"]
+  },
+  {
+    "question": "What programs can I study?",
+    "expected_intents": ["courses"],
+    "expected_answer_contains": ["Courses currently listed:", "B.Sc. Computer Science"]
+  },
+  {
+    "question": "What homework is pending?",
+    "expected_intents": ["assignments"],
+    "expected_answer_contains": ["You have no pending assignments."]
+  },
+  {
+    "question": "When are my coursework deadlines?",
+    "expected_intents": ["assignments"],
+    "expected_answer_contains": ["No assignments have been published yet."]
+  },
+  {
+    "question": "Show my grades",
+    "expected_intents": ["student_results"],
+    "expected_answer_contains": ["No individual marks have been published for you yet."]
+  },
+  {
+    "question": "What are my published marks?",
+    "expected_intents": ["student_results"],
+    "expected_answer_contains": ["No individual marks have been published for you yet."]
+  },
+  {
+    "question": "What are the class pass rates?",
+    "expected_intents": ["class_results"],
+    "expected_answer_contains": ["Latest published class pass rates:", "Computer Science: 75% pass"]
+  },
+  {
+    "question": "What's the timetable?",
+    "expected_intents": ["schedule"],
+    "expected_answer_contains": ["I don't have reliable information"]
+  },
+  {
+    "question": "When do classes meet?",
+    "expected_intents": ["schedule"],
+    "expected_answer_contains": ["I don't have reliable information"]
+  },
+  {
+    "question": "How is my attendance calculated?",
+    "expected_intents": ["attendance"],
+    "expected_answer_contains": ["Your attendance is", "Attendance is calculated from the attendance records"]
+  },
+  {
+    "question": "Who is my advisor?",
+    "expected_intents": ["mentor"],
+    "expected_answer_contains": ["Your assigned mentor is Knowledge Mentor."]
+  },
+  {
+    "question": "What is the tuition fee and course?",
+    "expected_intents": ["fees", "courses"],
+    "expected_answer_contains": ["Current fee structure:", "Courses currently listed:"]
+  },
+  {
+    "question": "What is the fee structure and class timetable?",
+    "expected_intents": ["fees", "schedule"],
+    "expected_answer_contains": ["Current fee structure:", "I don't have reliable information"]
+  },
+  {
+    "question": "What's the weather today?",
+    "expected_intents": [],
+    "expected_answer_contains": ["I don't have reliable information"]
+  }
+]

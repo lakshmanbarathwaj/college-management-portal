@@ -1,0 +1,56 @@
+{% extends "accounts/base.html" %}
+{% load static %}
+{% block title %}Choose your portal{% endblock %}
+{% block content %}
+<section class="portal-home">
+  <div class="portal-home-intro">
+    <img class="login-logo mb-4" src="{% static 'accounts/college-logo.svg' %}" alt="Sembon College">
+    <div class="eyebrow">SEMBON COLLEGE · B.SC. COMPUTER SCIENCE</div>
+    <h1 class="display-5 fw-bold mt-3">One campus.<br>Three dedicated portals.</h1>
+    <p class="lead mt-3">Choose your role to continue to the right place for your college work.</p>
+    <div class="portal-home-note">
+      <span class="portal-note-icon" aria-hidden="true">✓</span>
+      Your account can only sign in through its assigned portal.
+    </div>
+  </div>
+  <div class="portal-choice-list" aria-label="Choose a sign-in portal">
+    <form method="get" action="{% url 'login' %}">
+      <input type="hidden" name="role" value="admin">
+      <button class="portal-choice" type="submit">
+        <span class="portal-choice-icon admin-choice-icon" aria-hidden="true">A</span>
+        <span class="portal-choice-copy">
+          <span class="portal-choice-title">Administrator</span>
+          <span class="portal-choice-description">Manage college records, directories, and requests.</span>
+        </span>
+        <span class="portal-choice-arrow" aria-hidden="true">→</span>
+      </button>
+    </form>
+    <form method="get" action="{% url 'login' %}">
+      <input type="hidden" name="role" value="staff">
+      <button class="portal-choice" type="submit">
+        <span class="portal-choice-icon staff-choice-icon" aria-hidden="true">S</span>
+        <span class="portal-choice-copy">
+          <span class="portal-choice-title">Staff</span>
+          <span class="portal-choice-description">Take attendance and manage student assignments.</span>
+        </span>
+        <span class="portal-choice-arrow" aria-hidden="true">→</span>
+      </button>
+    </form>
+    <form method="get" action="{% url 'login' %}">
+      <input type="hidden" name="role" value="student">
+      <button class="portal-choice" type="submit">
+        <span class="portal-choice-icon student-choice-icon" aria-hidden="true">S</span>
+        <span class="portal-choice-copy">
+          <span class="portal-choice-title">Student</span>
+          <span class="portal-choice-description">Check attendance, assignments, and college updates.</span>
+        </span>
+        <span class="portal-choice-arrow" aria-hidden="true">→</span>
+      </button>
+    </form>
+    <p class="small text-secondary text-center mb-0 mt-2">
+      Need an account?
+      <a href="{% url 'membership_request' %}">Request staff or student access</a>
+    </p>
+  </div>
+</section>
+{% endblock %}

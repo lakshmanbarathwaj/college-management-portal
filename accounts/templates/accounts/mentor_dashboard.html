@@ -1,0 +1,86 @@
+{% extends "accounts/base.html" %}
+{% load static %}
+{% block title %}Mentor Dashboard{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+  <div>
+    <div class="eyebrow">Sembon College · Staff</div>
+    <h1 class="h2 fw-bold mt-2 mb-1">Mentor dashboard</h1>
+    <p class="text-secondary mb-0">Student chats forwarded directly to you.</p>
+  </div>
+  <a class="btn btn-outline-primary" href="{% url 'staff_dashboard' %}">← Staff dashboard</a>
+</div>
+<section class="mentor-dashboard" data-mentor-dashboard
+  {% if selected_conversation %}
+    data-conversation-id="{{ selected_conversation.pk }}"
+    data-updates-url="{% url 'mentor_chat_updates' selected_conversation.pk %}"
+    data-reply-url="{% url 'mentor_chat_reply' selected_conversation.pk %}"
+  {% endif %}>
+  <aside class="mentor-chat-list" aria-label="Forwarded student chats">
+    <div class="mentor-chat-list-heading">
+      <h2>Forwarded chats</h2>
+      <span>{{ conversations|length }}</span>
+    </div>
+    {% for chat in conversations %}
+      <a class="mentor-chat-list-item {% if selected_conversation.pk == chat.pk %}is-selected{% endif %}"
+        href="?chat_id={{ chat.pk }}">
+        <span class="mentor-chat-student">{{ chat.student.user.get_full_name|default:"Student" }}</span>
+        <span class="mentor-chat-preview">{{ chat.messages.last.body|default:"No messages yet" }}</span>
+        <span class="mentor-chat-item-meta">
+          <span class="badge {% if chat.status == 'closed' %}text-bg-secondary{% elif chat.status == 'replied' %}text-bg-success{% else %}text-bg-warning{% endif %}">{{ chat.get_status_display }}</span>
+          {% if chat.unread_count %}<span class="mentor-unread-badge" aria-label="{{ chat.unread_count }} unread messages">{{ chat.unread_count }}</span>{% endif %}
+        </span>
+      </a>
+    {% empty %}
+      <p class="mentor-chat-list-empty">No chats have been forwarded to you.</p>
+    {% endfor %}
+  </aside>
+  <div class="mentor-chat-panel">
+    {% if selected_conversation %}
+      <header class="mentor-chat-panel-heading">
+        <div>
+          <h2>{{ selected_conversation.student.user.get_full_name|default:"Student" }}</h2>
+          <p>Chat #{{ selected_conversation.pk }} · Forwarded {{ selected_conversation.forwarded_at|date:"d M Y, H:i" }}</p>
+        </div>
+        <span class="chat-status-badge" data-mentor-status>{{ selected_conversation.get_status_display }}</span>
+      </header>
+      <div class="mentor-chat-thread" data-mentor-thread role="log" aria-live="polite">
+        {% for chat_message in selected_conversation.messages.all %}
+          <div class="mentor-thread-message {% if chat_message.sender == user %}mentor-thread-own{% elif chat_message.sender %}mentor-thread-student{% else %}mentor-thread-assistant{% endif %}" data-message-id="{{ chat_message.pk }}">
+            <div class="mentor-thread-meta">
+              <strong>{% if chat_message.sender == user %}You{% elif chat_message.sender %}{{ chat_message.sender.get_full_name|default:"Student" }}{% else %}Campus assistant{% endif %}</strong>
+              <time datetime="{{ chat_message.sent_at|date:'c' }}">{{ chat_message.sent_at|date:"d M, H:i" }}</time>
+            </div>
+            <div class="mentor-thread-text">{{ chat_message.body|linebreaksbr }}</div>
+          </div>
+        {% empty %}
+          <p class="text-secondary">This chat has no messages.</p>
+        {% endfor %}
+      </div>
+      <div class="chat-feedback" data-mentor-feedback role="status" aria-live="polite"></div>
+      <div class="mentor-chat-actions">
+        <form method="post" action="{% url 'mentor_chat_reply' selected_conversation.pk %}" data-mentor-reply-form>
+          {% csrf_token %}
+          <label class="visually-hidden" for="mentor-reply">Reply to student</label>
+          <textarea class="form-control" id="mentor-reply" name="body" rows="2" maxlength="4000" placeholder="Write a reply..." required {% if selected_conversation.status == "closed" %}disabled{% endif %}></textarea>
+          <button class="btn btn-primary btn-sm mt-2" type="submit" {% if selected_conversation.status == "closed" %}disabled{% endif %}>Send reply</button>
+        </form>
+        <form method="post" action="{% url 'mentor_chat_reply' selected_conversation.pk %}" data-mentor-close-form>
+          {% csrf_token %}
+          <input type="hidden" name="action" value="close">
+          <button class="btn btn-outline-secondary btn-sm" type="submit" {% if selected_conversation.status == "closed" %}disabled{% endif %}>Mark chat closed</button>
+        </form>
+      </div>
+    {% else %}
+      <div class="mentor-chat-empty">
+        <span class="chat-empty-icon" aria-hidden="true">✦</span>
+        <h2>Select a student chat</h2>
+        <p>Choose a forwarded conversation to review and reply.</p>
+      </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}
+{% block extra_scripts %}
+  <script src="{% static 'accounts/mentor_dashboard.js' %}" defer></script>
+{% endblock %}
