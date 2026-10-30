@@ -1,66 +1,56 @@
-import json
-import re
+import mimetypes
 from pathlib import Path
+from urllib.parse import unquote
 
-from flask import Flask, jsonify, render_template, request, send_from_directory
-
-
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
-TEMPLATE_DIR = PROJECT_ROOT / "accounts" / "templates" / "flask"
-STATIC_DIR = PROJECT_ROOT / "accounts" / "static"
-KNOWLEDGE_PATH = PROJECT_ROOT / "accounts" / "data" / "chat_knowledge.json"
-
-with KNOWLEDGE_PATH.open(encoding="utf-8") as knowledge_file:
-    KNOWLEDGE = json.load(knowledge_file)
-
-app = Flask(
-    __name__,
-    template_folder=str(TEMPLATE_DIR),
-    static_folder=None,
-)
+from config.wsgi import application as django_application
 
 
-def _normalize(value):
-    return " ".join(re.sub(r"[^a-z0-9]+", " ", value.casefold()).split())
+STATIC_DIR = Path(__file__).resolve().parent.parent / "accounts" / "static"
 
 
-def answer_question(question):
-    normalized_question = _normalize(question)
-    matches = []
-    for intent in KNOWLEDGE["intents"]:
-        for alias in intent["aliases"]:
-            normalized_alias = _normalize(alias)
-            if f" {normalized_alias} " in f" {normalized_question} ":
-                matches.append((len(normalized_alias), intent["id"]))
-    if matches:
-        _, intent_id = max(matches)
-        answer = KNOWLEDGE["answers"].get(intent_id)
-        if answer:
-            return answer
-    return KNOWLEDGE["unknown_answer"]
+class StaticFilesMiddleware:
+    def __init__(self, application):
+        self.application = application
+        self.static_root = STATIC_DIR.resolve()
+
+    def __call__(self, environ, start_response):
+        path_info = environ.get("PATH_INFO", "")
+        if not path_info.startswith("/static/"):
+            return self.application(environ, start_response)
+
+        relative_path = unquote(path_info.removeprefix("/static/"))
+        file_path = (self.static_root / relative_path).resolve()
+        try:
+            file_path.relative_to(self.static_root)
+        except ValueError:
+            return self._not_found(start_response)
+
+        if not file_path.is_file():
+            return self._not_found(start_response)
+
+        content_type = mimetypes.guess_type(file_path.name)[0] or "application/octet-stream"
+        content = file_path.read_bytes()
+        start_response(
+            "200 OK",
+            [
+                ("Content-Type", content_type),
+                ("Content-Length", str(len(content))),
+                ("Cache-Control", "public, max-age=3600"),
+            ],
+        )
+        return [content]
+
+    @staticmethod
+    def _not_found(start_response):
+        body = b"Not Found"
+        start_response(
+            "404 Not Found",
+            [
+                ("Content-Type", "text/plain; charset=utf-8"),
+                ("Content-Length", str(len(body))),
+            ],
+        )
+        return [body]
 
 
-@app.get("/")
-def home():
-    return render_template("index.html")
-
-
-@app.get("/health")
-def health():
-    return jsonify({"status": "ok"})
-
-
-@app.get("/static/<path:filename>")
-def static(filename):
-    return send_from_directory(STATIC_DIR, filename)
-
-
-@app.post("/api/answer")
-def answer():
-    payload = request.get_json(silent=True)
-    question = payload.get("question") if isinstance(payload, dict) else None
-    if not isinstance(question, str) or not question.strip():
-        return jsonify({"error": "Enter a question to get an answer."}), 400
-    if len(question) > 500:
-        return jsonify({"error": "Questions must be 500 characters or fewer."}), 400
-    return jsonify({"answer": answer_question(question)})
+app = StaticFilesMiddleware(django_application)
